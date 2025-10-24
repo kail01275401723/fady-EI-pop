@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>قراءة QR وتعبئة البيانات</title>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
+<style>
+  body { font-family: sans-serif; text-align: center; margin-top: 30px; direction: rtl; }
+  input { display: block; margin: 10px auto; padding: 8px; width: 220px; }
+  #reader { width: 250px; margin: 20px auto; display: none; }
+  button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+</style>
+</head>
+<body>
+  <h2>📱 امسح QR لملء البيانات تلقائيًا</h2>
+  <button id="startBtn">تشغيل الكاميرا</button>
+  <div id="reader"></div>
+
+  <h3>البيانات المستلمة:</h3>
+  <input type="text" id="name" placeholder="الاسم">
+  <input type="text" id="phone" placeholder="رقم الموبايل">
+  <input type="text" id="address" placeholder="العنوان">
+  <button onclick="saveData()">حفظ البيانات</button>
+
+  <script>
+    let html5QrCode;
+    let isScanning = false;
+
+    function onScanSuccess(decodedText) {
+      try {
+        const data = JSON.parse(decodedText);
+        document.getElementById("name").value = data.name || "";
+        document.getElementById("phone").value = data.phone || "";
+        document.getElementById("address").value = data.address || "";
+        alert("✅ تم قراءة البيانات بنجاح!");
+        stopCamera();
+      } catch (e) {
+        alert("❌ الكود غير صالح!");
+      }
+    }
+
+    function startCamera() {
+      if (isScanning) return;
+      isScanning = true;
+      document.getElementById("reader").style.display = "block";
+      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 200 }, onScanSuccess)
+        .catch(err => {
+          alert("حدث خطأ في تشغيل الكاميرا: " + err);
+          isScanning = false;
+        });
+    }
+
+    function stopCamera() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+          document.getElementById("reader").style.display = "none";
+          isScanning = false;
+        });
+      }
+    }
+
+    function saveData() {
+      const data = {
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        address: document.getElementById("address").value
+      };
+      localStorage.setItem("lastData", JSON.stringify(data));
+      window.location.href = "form3.html";
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startCamera);
+  </script>
+</body>
+</html>

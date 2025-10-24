@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>توليد QR من البيانات</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<style>
+  body { font-family: sans-serif; text-align: center; margin-top: 50px; direction: rtl; }
+  input { display: block; margin: 10px auto; padding: 8px; width: 220px; }
+  button { padding: 10px 20px; font-size: 16px; }
+  #qrcode { margin-top: 20px; }
+</style>
+</head>
+<body>
+  <h2>📋 إدخال البيانات لتوليد QR</h2>
+  <input type="text" id="name" placeholder="الاسم">
+  <input type="text" id="phone" placeholder="رقم الموبايل">
+  <input type="text" id="address" placeholder="العنوان">
+  <button onclick="generateQR()">توليد QR</button>
+
+  <div id="qrcode"></div>
+
+  <script>
+    function generateQR() {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const data = JSON.stringify({ name, phone, address });
+      document.getElementById("qrcode").innerHTML = "";
+      QRCode.toCanvas(document.createElement('canvas'), data, { width: 200 }, function (err, canvas) {
+        if (!err) document.getElementById("qrcode").appendChild(canvas);
+      });
+    }
+  </script>
+</body>
+</html>
